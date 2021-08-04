@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.*
 import ru.konstantin.myweatherapp.R
 import ru.konstantin.myweatherapp.databinding.MainFragmentBinding
 import ru.konstantin.myweatherapp.model.AppState
@@ -24,6 +25,9 @@ class MainFragment : Fragment() {
     private var _binding: MainFragmentBinding? = null
     private val binding
         get() = _binding!!
+
+    private val adapter = MainFragmentAdapter()
+    private var isDataSetRus: Boolean = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,44 +47,52 @@ class MainFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
     }
 
+    @DelicateCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding.mainFragmentRecyclerView.adapter = adapter
+        binding.mainFragmentFAB.setOnClickListener {
+            changeWeatherDataSet()
+        }
         val observer = Observer<AppState> { a ->
             renderData(a)
         }
         viewModel.getData().observe(viewLifecycleOwner, observer)
-        viewModel.getWeatherFromRemoteSource()
+            GlobalScope.launch {
+                viewModel.getWeatherFromRemoteSource()
+            }
     }
 
+    private fun changeWeatherDataSet() {
+        if (isDataSetRus) {
+            viewModel.getWeatherFromRemoteSource()
+            binding.mainFragmentFAB.setImageResource(R.drawable.ic_earth)
+        } else {
+            viewModel.getWeatherFromRemoteSource()
+            binding.mainFragmentFAB.setImageResource(R.drawable.ic_russia)
+        }
+        isDataSetRus = !isDataSetRus
+    }
+
+    @DelicateCoroutinesApi
     private fun renderData(data: AppState) {
         when (data) {
             is AppState.Success -> {
                 val weatherData = data.weatherData
                 binding.loadingLayout.visibility = View.GONE
-                populateData(weatherData)
+                adapter.setWeather(weatherData)
             }
             is AppState.Loading -> {
                 binding.loadingLayout.visibility = View.VISIBLE
             }
             is AppState.Error -> {
                 binding.loadingLayout.visibility = View.GONE
-                Snackbar.make(binding.main, "Error", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Reload") { viewModel.getWeatherFromRemoteSource() }
+                Snackbar.make(binding.mainFragmentFAB, "Error", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Reload") {
+                        if (isDataSetRus) viewModel.getWeatherFromRemoteSource()
+                        else viewModel.getWeatherFromRemoteSource()
+                    }
                     .show()
             }
         }
     }
-
-    private fun populateData(weatherData: WeatherBigData) {
-        with(binding) {
-            cityName.text = weatherData.location?.name?:""
-            cityCoordinates.text = String.format(
-                getString(R.string.city_coordinates),
-                weatherData.location?.lat?:"",
-                weatherData.location?.lon?:""
-            )
-            temperatureValue.text = weatherData.current?.tempC.toString()?:""
-            mainConditionLabel.text = weatherData.current?.condition?.text?:""
-        }
-    }
-
 }
