@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setCities()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         if (savedInstanceState == null) {
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
                 .replace(binding.container.id, MainFragment.newInstance())
                 .commitNow()
         }
+    }
 
     private fun setCities() {
         russianCities = GeoCityService().getListCitiesFromFile(

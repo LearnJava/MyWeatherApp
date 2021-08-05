@@ -1,3 +1,7 @@
 package ru.konstantin.myweatherapp.model.data
 
-data class GeoCity(val cityName: String = "", val latitude: Double, val longitude: Double )
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
+data class GeoCity(val cityName: String = "", val latitude: Double, val longitude: Double ): Parcelable

@@ -12,6 +12,7 @@ import kotlinx.coroutines.*
 import ru.konstantin.myweatherapp.R
 import ru.konstantin.myweatherapp.databinding.MainFragmentBinding
 import ru.konstantin.myweatherapp.model.AppState
+import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.model.data.WeatherBigData
 import ru.konstantin.myweatherapp.viewmodel.MainViewModel
 
@@ -29,6 +30,8 @@ class MainFragment : Fragment() {
     private val adapter = MainFragmentAdapter()
     private var isDataSetRus: Boolean = true
 
+    private lateinit var cityList: List<GeoCity>
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,15 +43,31 @@ class MainFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        adapter.removeOnItemViewClickListener()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        cityList = russianCities
     }
 
     @DelicateCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        adapter.setOnItemViewClickListener(object : OnItemViewClickListener {
+            override fun onItemViewClick(geoCity: GeoCity) {
+                val manager = activity?.supportFragmentManager
+                if (manager != null) {
+                    val bundle = Bundle()
+                    bundle.putParcelable(DetailsFragment.BUNDLE_EXTRA, geoCity)
+                    manager.beginTransaction()
+                        .replace(R.id.container, DetailsFragment.newInstance(bundle))
+                        .addToBackStack("")
+                        .commitAllowingStateLoss()
+                }
+            }
+        })
+
         binding.mainFragmentRecyclerView.adapter = adapter
         binding.mainFragmentFAB.setOnClickListener {
             changeWeatherDataSet()
@@ -66,8 +85,9 @@ class MainFragment : Fragment() {
         isDataSetRus = !isDataSetRus
 
         if (isDataSetRus) {
-            viewModel.getWeatherFromRemoteSource()
-            binding.mainFragmentFAB.setImageResource(R.drawable.ic_earth)
+            cityList = russianCities
+            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+            binding.mainFragmentFAB.setImageResource(R.drawable.ic_russia)
         } else {
             cityList = capitals
             viewModel.getWeatherFromRemoteSource(isDataSetRus)
@@ -79,7 +99,7 @@ class MainFragment : Fragment() {
     private fun renderData(data: AppState) {
         when (data) {
             is AppState.Success -> {
-                val weatherData = data.weatherData
+                val weatherData = data.geocityList
                 binding.loadingLayout.visibility = View.GONE
                 adapter.setWeather(weatherData)
             }
@@ -96,5 +116,9 @@ class MainFragment : Fragment() {
                     .show()
             }
         }
+    }
+
+    interface OnItemViewClickListener {
+        fun onItemViewClick(geoCity: GeoCity)
     }
 }
