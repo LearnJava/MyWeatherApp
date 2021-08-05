@@ -57,20 +57,22 @@ class MainFragment : Fragment() {
             renderData(a)
         }
         viewModel.getData().observe(viewLifecycleOwner, observer)
-            GlobalScope.launch {
-                viewModel.getWeatherFromRemoteSource()
-            }
+        GlobalScope.launch {
+            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+        }
     }
 
     private fun changeWeatherDataSet() {
+        isDataSetRus = !isDataSetRus
+
         if (isDataSetRus) {
             viewModel.getWeatherFromRemoteSource()
             binding.mainFragmentFAB.setImageResource(R.drawable.ic_earth)
         } else {
-            viewModel.getWeatherFromRemoteSource()
-            binding.mainFragmentFAB.setImageResource(R.drawable.ic_russia)
+            cityList = capitals
+            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+            binding.mainFragmentFAB.setImageResource(R.drawable.ic_earth)
         }
-        isDataSetRus = !isDataSetRus
     }
 
     @DelicateCoroutinesApi
@@ -88,8 +90,8 @@ class MainFragment : Fragment() {
                 binding.loadingLayout.visibility = View.GONE
                 Snackbar.make(binding.mainFragmentFAB, "Error", Snackbar.LENGTH_INDEFINITE)
                     .setAction("Reload") {
-                        if (isDataSetRus) viewModel.getWeatherFromRemoteSource()
-                        else viewModel.getWeatherFromRemoteSource()
+                        if (isDataSetRus) viewModel.getWeatherFromRemoteSource(isDataSetRus)
+                        else viewModel.getWeatherFromRemoteSource(isDataSetRus)
                     }
                     .show()
             }

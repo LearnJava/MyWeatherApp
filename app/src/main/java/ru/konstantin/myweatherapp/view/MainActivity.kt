@@ -1,7 +1,7 @@
 package ru.konstantin.myweatherapp.view
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import ru.konstantin.myweatherapp.databinding.ActivityMainBinding
 import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.service.GeoCityService
@@ -23,7 +23,8 @@ class MainActivity : AppCompatActivity() {
                 .commitNow()
         }
 
-        russianCities = GeoCityService().getAllRussianCities(
+    private fun setCities() {
+        russianCities = GeoCityService().getListCitiesFromFile(
             resources.openRawResource(
                 resources.getIdentifier(
                     "russiancities",
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        capitals = GeoCityService().getAllRussianCities(
+        capitals = GeoCityService().getListCitiesFromFile(
             resources.openRawResource(
                 resources.getIdentifier(
                     "capitals",

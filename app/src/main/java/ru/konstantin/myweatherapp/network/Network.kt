@@ -7,6 +7,7 @@ import java.net.URL
 
 class Network {
 
+    //TODO Will create own method for creating URL
     fun getWeather(geoCity: GeoCity): String {
         val client = OkHttpClient()
         val url =

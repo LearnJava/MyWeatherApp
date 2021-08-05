@@ -9,8 +9,4 @@ class WeatherRepositoryImpl : WeatherRepository {
 
         return Network().getWeather(geoCity)
     }
-
-    override fun getWeatherFromLocalStorage(): WeatherBigData {
-        return WeatherBigData()
-    }
 }

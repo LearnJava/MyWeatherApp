@@ -5,7 +5,7 @@ import java.io.InputStream
 
 class GeoCityService {
 
-    fun getAllRussianCities(inputStream: InputStream): List<GeoCity> {
+    fun getListCitiesFromFile(inputStream: InputStream): List<GeoCity> {
         val geoCities = mutableListOf<GeoCity>()
 
         inputStream.bufferedReader().forEachLine {
