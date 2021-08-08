@@ -118,8 +118,12 @@ class MainFragment : Fragment() {
                 binding.loadingLayout.visibility = View.GONE
                 Snackbar.make(binding.mainFragmentFAB, resources.getString(R.string.error_text), Snackbar.LENGTH_INDEFINITE)
                     .setAction(resources.getString(R.string.reload_text)) {
-                        if (isDataSetRus) viewModel.getWeatherFromRemoteSource(isDataSetRus)
-                        else viewModel.getWeatherFromRemoteSource(isDataSetRus)
+                        if (isDataSetRus) {
+                            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+                        }
+                        else {
+                            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+                        }
                     }
                     .show()
             }
