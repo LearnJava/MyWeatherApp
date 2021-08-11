@@ -8,12 +8,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import ru.konstantin.myweatherapp.R
 import ru.konstantin.myweatherapp.databinding.MainFragmentBinding
 import ru.konstantin.myweatherapp.model.AppState
 import ru.konstantin.myweatherapp.model.data.GeoCity
-import ru.konstantin.myweatherapp.model.data.WeatherBigData
+import ru.konstantin.myweatherapp.service.EMPTY_SIGN
 import ru.konstantin.myweatherapp.viewmodel.MainViewModel
 
 class MainFragment : Fragment() {
@@ -49,7 +51,7 @@ class MainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        cityList = russianCities
+//        cityList = russianCities
     }
 
     @DelicateCoroutinesApi
@@ -57,27 +59,33 @@ class MainFragment : Fragment() {
         adapter.setOnItemViewClickListener(object : OnItemViewClickListener {
             override fun onItemViewClick(geoCity: GeoCity) {
                 val manager = activity?.supportFragmentManager
-                if (manager != null) {
+
+                manager?.let {
                     val bundle = Bundle()
                     bundle.putParcelable(DetailsFragment.BUNDLE_EXTRA, geoCity)
                     manager.beginTransaction()
                         .replace(R.id.container, DetailsFragment.newInstance(bundle))
-                        .addToBackStack("")
+                        .addToBackStack(EMPTY_SIGN)
                         .commitAllowingStateLoss()
                 }
             }
         })
 
-        binding.mainFragmentRecyclerView.adapter = adapter
-        binding.mainFragmentFAB.setOnClickListener {
-            changeWeatherDataSet()
+        with(binding) {
+            mainFragmentRecyclerView.adapter = adapter
+            mainFragmentFAB.setOnClickListener {
+                changeWeatherDataSet()
+            }
         }
-        val observer = Observer<AppState> { a ->
-            renderData(a)
+        val observer = Observer<AppState> {
+            renderData(it)
         }
-        viewModel.getData().observe(viewLifecycleOwner, observer)
-        GlobalScope.launch {
-            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+
+        with(viewModel) {
+            getData().observe(viewLifecycleOwner, observer)
+            GlobalScope.launch {
+                getWeatherFromRemoteSource(isDataSetRus)
+            }
         }
     }
 
@@ -99,19 +107,23 @@ class MainFragment : Fragment() {
     private fun renderData(data: AppState) {
         when (data) {
             is AppState.Success -> {
-                val weatherData = data.geocityList
                 binding.loadingLayout.visibility = View.GONE
-                adapter.setWeather(weatherData)
+                adapter.setWeather(data.geocityList)
             }
             is AppState.Loading -> {
                 binding.loadingLayout.visibility = View.VISIBLE
             }
+
             is AppState.Error -> {
                 binding.loadingLayout.visibility = View.GONE
-                Snackbar.make(binding.mainFragmentFAB, "Error", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Reload") {
-                        if (isDataSetRus) viewModel.getWeatherFromRemoteSource(isDataSetRus)
-                        else viewModel.getWeatherFromRemoteSource(isDataSetRus)
+                Snackbar.make(binding.mainFragmentFAB, resources.getString(R.string.error_text), Snackbar.LENGTH_INDEFINITE)
+                    .setAction(resources.getString(R.string.reload_text)) {
+                        if (isDataSetRus) {
+                            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+                        }
+                        else {
+                            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+                        }
                     }
                     .show()
             }

@@ -24,11 +24,11 @@ class DetailsFragment : Fragment() {
 
     private lateinit var weatherService: WeatherService
     private lateinit var weatherViewModel: WeatherViewModel
+    private var _binding: DetailsFragmentBinding? = null
+    private val binding get() = _binding!!
 
     lateinit var geoCity: GeoCity
 
-    private var _binding: DetailsFragmentBinding? = null
-    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,8 +52,10 @@ class DetailsFragment : Fragment() {
         val observer = Observer<AppWeatherState> { appWeatherState ->
             renderData(appWeatherState)
         }
-        weatherViewModel.getData().observe(viewLifecycleOwner, observer)
-        weatherViewModel.getWeatherFromRemoteSource(geoCity)
+        with(weatherViewModel) {
+            getData().observe(viewLifecycleOwner, observer)
+            getWeatherFromRemoteSource(geoCity)
+        }
     }
 
     private fun renderData(data: AppWeatherState) {
