@@ -22,7 +22,6 @@ import ru.konstantin.myweatherapp.viewmodel.WeatherViewModel
 
 class DetailsFragment : Fragment() {
 
-    private lateinit var weatherService: WeatherService
     private lateinit var weatherViewModel: WeatherViewModel
     private var _binding: DetailsFragmentBinding? = null
     private val binding get() = _binding!!
@@ -40,7 +39,6 @@ class DetailsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        weatherService = WeatherService()
         _binding = DetailsFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
