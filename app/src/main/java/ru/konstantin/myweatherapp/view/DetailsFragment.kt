@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.konstantin.myweatherapp.R
 import ru.konstantin.myweatherapp.databinding.DetailsFragmentBinding
@@ -26,9 +27,7 @@ class DetailsFragment : Fragment() {
     private lateinit var weatherViewModel: WeatherViewModel
     private var _binding: DetailsFragmentBinding? = null
     private val binding get() = _binding!!
-
     lateinit var geoCity: GeoCity
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,14 +68,22 @@ class DetailsFragment : Fragment() {
                 binding.loadingLayout.visibility = View.VISIBLE
             }
             is AppWeatherState.Error -> {
-                println("ERROR!!!")
+                binding.loadingLayout.visibility = View.GONE
+                Snackbar.make(
+                    binding.cityName,
+                    resources.getString(R.string.error_text),
+                    Snackbar.LENGTH_INDEFINITE
+                )
+                    .setAction(resources.getString(R.string.reload_text)) {
+                        weatherViewModel.getWeatherFromRemoteSource(geoCity)
+                    }.show()
             }
         }
     }
 
     private fun populateData(weatherBigData: WeatherBigData) {
         with(binding) {
-            cityName.text = geoCity.cityName ?: "---"
+            cityName.text = geoCity.cityName
             cityCoordinates.text = String.format(
                 getString(R.string.city_coordinates),
                 weatherBigData.location?.lat.toString(),

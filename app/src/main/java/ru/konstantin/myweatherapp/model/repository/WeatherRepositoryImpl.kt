@@ -6,7 +6,6 @@ import ru.konstantin.myweatherapp.network.Network
 
 class WeatherRepositoryImpl : WeatherRepository {
     override fun getWeatherFromServer(geoCity: GeoCity): String {
-
         return Network().getWeather(geoCity)
     }
 }
