@@ -1,5 +1,7 @@
 package ru.konstantin.myweatherapp.view
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager.CONNECTIVITY_ACTION
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +18,7 @@ import ru.konstantin.myweatherapp.databinding.MainFragmentBinding
 import ru.konstantin.myweatherapp.model.AppState
 import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.service.EMPTY_SIGN
+import ru.konstantin.myweatherapp.service.MainBroadcastReceiver
 import ru.konstantin.myweatherapp.viewmodel.MainViewModel
 
 class MainFragment : Fragment() {
@@ -23,6 +26,8 @@ class MainFragment : Fragment() {
     companion object {
         fun newInstance() = MainFragment()
     }
+
+    private val receiver = MainBroadcastReceiver()
 
     private lateinit var viewModel: MainViewModel
     private var _binding: MainFragmentBinding? = null
@@ -51,6 +56,7 @@ class MainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        context?.registerReceiver(receiver, IntentFilter(CONNECTIVITY_ACTION))
 //        cityList = russianCities
     }
 

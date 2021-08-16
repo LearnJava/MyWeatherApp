@@ -1,5 +1,6 @@
 package ru.konstantin.myweatherapp.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +18,10 @@ import ru.konstantin.myweatherapp.model.AppState
 import ru.konstantin.myweatherapp.model.AppWeatherState
 import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.model.data.WeatherBigData
+import ru.konstantin.myweatherapp.service.LATITUDE_EXTRA
+import ru.konstantin.myweatherapp.service.LONGITUDE_EXTRA
 import ru.konstantin.myweatherapp.service.WeatherService
+import ru.konstantin.myweatherapp.service.WeatherServiceIntent
 import ru.konstantin.myweatherapp.viewmodel.WeatherViewModel
 
 class DetailsFragment : Fragment() {
@@ -54,7 +58,21 @@ class DetailsFragment : Fragment() {
         }
         with(weatherViewModel) {
             getData().observe(viewLifecycleOwner, observer)
-            getWeatherFromRemoteSource(geoCity)
+//            getWeatherFromRemoteSource(geoCity)
+
+
+            context?.let {
+                it.startService(Intent(it, WeatherServiceIntent::class.java).apply {
+                    putExtra(
+                        LATITUDE_EXTRA,
+                        geoCity.latitude
+                    )
+                    putExtra(
+                        LONGITUDE_EXTRA,
+                        geoCity.longitude
+                    )
+                })
+            }
         }
     }
 

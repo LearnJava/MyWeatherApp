@@ -30,4 +30,10 @@ class WeatherViewModel(private val weatherService: WeatherService = WeatherServi
             liveDataToObserve.postValue(AppWeatherState.Success(weather))
         }
     }
+
+    fun getWeatherFromRemoteSourceByLatAndLon(lat: String, lon: String) {
+        liveDataToObserve.postValue(AppWeatherState.Loading)
+            val weather = weatherService.getCityWeatherByLatAndLon(lat, lon)
+            liveDataToObserve.postValue(AppWeatherState.Success(weather))
+    }
 }
