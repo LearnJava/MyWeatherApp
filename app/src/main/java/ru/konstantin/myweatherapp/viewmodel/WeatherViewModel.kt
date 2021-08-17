@@ -16,8 +16,6 @@ class WeatherViewModel(private val weatherService: WeatherService = WeatherServi
 
     private val liveDataToObserve: MutableLiveData<AppWeatherState> = MutableLiveData()
 
-    private var counter: Int = 0
-
     fun getData(): LiveData<AppWeatherState> {
         return liveDataToObserve
     }
@@ -25,9 +23,12 @@ class WeatherViewModel(private val weatherService: WeatherService = WeatherServi
     fun getWeatherFromRemoteSource(geoCity: GeoCity) {
         liveDataToObserve.postValue(AppWeatherState.Loading)
         GlobalScope.launch {
-            val weather = weatherService.getCityWeather(geoCity)
-            counter++
-            liveDataToObserve.postValue(AppWeatherState.Success(weather))
+            try {
+                val weather = weatherService.getCityWeather(geoCity)
+                liveDataToObserve.postValue(AppWeatherState.Success(weather))
+            } catch (e: Exception) {
+                liveDataToObserve.postValue(AppWeatherState.Error(e))
+            }
         }
     }
 

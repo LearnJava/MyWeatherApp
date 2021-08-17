@@ -98,15 +98,16 @@ class MainFragment : Fragment() {
     private fun changeWeatherDataSet() {
         isDataSetRus = !isDataSetRus
 
-        if (isDataSetRus) {
-            cityList = russianCities
-            viewModel.getWeatherFromRemoteSource(isDataSetRus)
-            binding.mainFragmentFAB.setImageResource(R.drawable.ic_russia)
-        } else {
-            cityList = capitals
-            viewModel.getWeatherFromRemoteSource(isDataSetRus)
-            binding.mainFragmentFAB.setImageResource(R.drawable.ic_earth)
+        when (isDataSetRus) {
+            true -> getData(russianCities, R.drawable.ic_russia)
+            else -> getData(capitals, R.drawable.ic_earth)
         }
+    }
+
+    private fun getData(cities: List<GeoCity>, icon: Int) {
+        cityList = cities
+        viewModel.getWeatherFromRemoteSource(isDataSetRus)
+        binding.mainFragmentFAB.setImageResource(icon)
     }
 
     @DelicateCoroutinesApi
@@ -122,16 +123,18 @@ class MainFragment : Fragment() {
 
             is AppState.Error -> {
                 binding.loadingLayout.visibility = View.GONE
-                Snackbar.make(binding.mainFragmentFAB, resources.getString(R.string.error_text), Snackbar.LENGTH_INDEFINITE)
+                Snackbar.make(
+                    binding.mainFragmentFAB,
+                    resources.getString(R.string.error_text),
+                    Snackbar.LENGTH_INDEFINITE
+                )
                     .setAction(resources.getString(R.string.reload_text)) {
                         if (isDataSetRus) {
                             viewModel.getWeatherFromRemoteSource(isDataSetRus)
-                        }
-                        else {
+                        } else {
                             viewModel.getWeatherFromRemoteSource(isDataSetRus)
                         }
-                    }
-                    .show()
+                    }.show()
             }
         }
     }

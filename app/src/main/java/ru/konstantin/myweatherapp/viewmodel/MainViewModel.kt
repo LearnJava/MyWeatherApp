@@ -7,7 +7,7 @@ import ru.konstantin.myweatherapp.model.AppState
 import ru.konstantin.myweatherapp.view.capitals
 import ru.konstantin.myweatherapp.view.russianCities
 
-class MainViewModel() :
+class MainViewModel :
     ViewModel() {
 
     private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData()
