@@ -1,37 +1,51 @@
 package ru.konstantin.myweatherapp.view
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import ru.konstantin.myweatherapp.R
 import ru.konstantin.myweatherapp.databinding.DetailsFragmentBinding
-import ru.konstantin.myweatherapp.model.AppState
-import ru.konstantin.myweatherapp.model.AppWeatherState
 import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.model.data.WeatherBigData
-import ru.konstantin.myweatherapp.service.WeatherService
-import ru.konstantin.myweatherapp.viewmodel.WeatherViewModel
+import ru.konstantin.myweatherapp.service.*
+
+private const val PROCESS_ERROR = "Обработка ошибки"
 
 class DetailsFragment : Fragment() {
 
-    private lateinit var weatherService: WeatherService
-    private lateinit var weatherViewModel: WeatherViewModel
     private var _binding: DetailsFragmentBinding? = null
     private val binding get() = _binding!!
+
     lateinit var geoCity: GeoCity
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        weatherViewModel = ViewModelProvider(this).get(WeatherViewModel::class.java)
+    private val loadResultsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.getStringExtra(DETAILS_LOAD_RESULT_EXTRA)) {
+                DETAILS_RESPONSE_SUCCESS_EXTRA -> {
+                    val weather = intent.getStringExtra(DETAILS_WEATHER)
+                    weather?.let<String, WeatherBigData> { Json.decodeFromString(it) }
+                        ?.let { populateData(it) }
+                }
+                else -> TODO(PROCESS_ERROR)
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        context?.let {
+            LocalBroadcastManager.getInstance(it).unregisterReceiver(loadResultsReceiver)
+        }
+        super.onDestroyView()
     }
 
     override fun onCreateView(
@@ -39,8 +53,11 @@ class DetailsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        weatherService = WeatherService()
         _binding = DetailsFragmentBinding.inflate(inflater, container, false)
+        context?.let {
+            LocalBroadcastManager.getInstance(it)
+                .registerReceiver(loadResultsReceiver, IntentFilter(DETAILS_INTENT_FILTER))
+        }
         return binding.root
     }
 
@@ -48,42 +65,24 @@ class DetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         geoCity = arguments?.getParcelable<GeoCity>(BUNDLE_EXTRA) ?: GeoCity("", 0.0, 0.0)
 
-        val observer = Observer<AppWeatherState> { appWeatherState ->
-            renderData(appWeatherState)
-        }
-        with(weatherViewModel) {
-            getData().observe(viewLifecycleOwner, observer)
-            getWeatherFromRemoteSource(geoCity)
+        context?.let {
+            it.startService(Intent(it, WeatherServiceIntent::class.java).apply {
+                putExtra(
+                    LATITUDE_EXTRA,
+                    geoCity.latitude
+                )
+                putExtra(
+                    LONGITUDE_EXTRA,
+                    geoCity.longitude
+                )
+            })
         }
     }
 
-    private fun renderData(data: AppWeatherState) {
-        when (data) {
-            is AppWeatherState.Success -> {
-                val weatherData = data.weatheBigDate
-                binding.loadingLayout.visibility = View.GONE
-                populateData(weatherData)
-            }
-            is AppWeatherState.Loading -> {
-                binding.loadingLayout.visibility = View.VISIBLE
-            }
-            is AppWeatherState.Error -> {
-                binding.loadingLayout.visibility = View.GONE
-                Snackbar.make(
-                    binding.cityName,
-                    resources.getString(R.string.error_text),
-                    Snackbar.LENGTH_INDEFINITE
-                )
-                    .setAction(resources.getString(R.string.reload_text)) {
-                        weatherViewModel.getWeatherFromRemoteSource(geoCity)
-                    }.show()
-            }
-        }
-    }
 
     private fun populateData(weatherBigData: WeatherBigData) {
         with(binding) {
-            cityName.text = geoCity.cityName
+            cityName.text = geoCity.cityName ?: "---"
             cityCoordinates.text = String.format(
                 getString(R.string.city_coordinates),
                 weatherBigData.location?.lat.toString(),

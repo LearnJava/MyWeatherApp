@@ -14,4 +14,9 @@ class WeatherService {
         val weather = weatherRepository.getWeatherFromServer(geoCity)
         return Json.decodeFromString<WeatherBigData>(weather)
     }
+
+    fun getCityWeatherByLatAndLon(latitude: String, longitude: String): WeatherBigData {
+        val weather = weatherRepository.getWeatherFromServerByLatAndLon(latitude, longitude)
+        return Json.decodeFromString<WeatherBigData>(weather)
+    }
 }

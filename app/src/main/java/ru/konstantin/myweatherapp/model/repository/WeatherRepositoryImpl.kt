@@ -8,4 +8,9 @@ class WeatherRepositoryImpl : WeatherRepository {
     override fun getWeatherFromServer(geoCity: GeoCity): String {
         return Network().getWeather(geoCity)
     }
+
+    fun getWeatherFromServerByLatAndLon(lat: String, lon: String): String {
+
+        return Network().getWeatherByLatAndLon(lat, lon)
+    }
 }
