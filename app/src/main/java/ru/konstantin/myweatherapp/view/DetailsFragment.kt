@@ -8,22 +8,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.squareup.picasso.Picasso
 import ru.konstantin.myweatherapp.R
 import ru.konstantin.myweatherapp.databinding.DetailsFragmentBinding
-import ru.konstantin.myweatherapp.model.AppState
 import ru.konstantin.myweatherapp.model.AppWeatherState
 import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.model.data.WeatherBigData
-import ru.konstantin.myweatherapp.service.WeatherService
 import ru.konstantin.myweatherapp.viewmodel.WeatherViewModel
 
 class DetailsFragment : Fragment() {
 
-    private lateinit var weatherService: WeatherService
     private lateinit var weatherViewModel: WeatherViewModel
     private var _binding: DetailsFragmentBinding? = null
     private val binding get() = _binding!!
@@ -39,7 +33,6 @@ class DetailsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        weatherService = WeatherService()
         _binding = DetailsFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -91,7 +84,13 @@ class DetailsFragment : Fragment() {
             )
             temperatureValue.text = weatherBigData.current?.tempC.toString()
             feelsLikeValue.text = weatherBigData.current?.feelslikeC.toString()
+
+        Picasso
+            .get()
+            .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
+            .into(headerIcon)
         }
+
     }
 
     companion object {
