@@ -14,18 +14,18 @@ import ru.konstantin.myweatherapp.databinding.DetailsFragmentBinding
 import ru.konstantin.myweatherapp.model.AppWeatherState
 import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.model.data.WeatherBigData
-import ru.konstantin.myweatherapp.viewmodel.WeatherViewModel
+import ru.konstantin.myweatherapp.viewmodel.ViewModelWeather
 
 class DetailsFragment : Fragment() {
 
-    private lateinit var weatherViewModel: WeatherViewModel
+    private lateinit var viewModelWeather: ViewModelWeather
     private var _binding: DetailsFragmentBinding? = null
     private val binding get() = _binding!!
     lateinit var geoCity: GeoCity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        weatherViewModel = ViewModelProvider(this).get(WeatherViewModel::class.java)
+        viewModelWeather = ViewModelProvider(this).get(ViewModelWeather::class.java)
     }
 
     override fun onCreateView(
@@ -44,7 +44,7 @@ class DetailsFragment : Fragment() {
         val observer = Observer<AppWeatherState> { appWeatherState ->
             renderData(appWeatherState)
         }
-        with(weatherViewModel) {
+        with(viewModelWeather) {
             getData().observe(viewLifecycleOwner, observer)
             getWeatherFromRemoteSource(geoCity)
         }
@@ -68,7 +68,7 @@ class DetailsFragment : Fragment() {
                     Snackbar.LENGTH_INDEFINITE
                 )
                     .setAction(resources.getString(R.string.reload_text)) {
-                        weatherViewModel.getWeatherFromRemoteSource(geoCity)
+                        viewModelWeather.getWeatherFromRemoteSource(geoCity)
                     }.show()
             }
         }

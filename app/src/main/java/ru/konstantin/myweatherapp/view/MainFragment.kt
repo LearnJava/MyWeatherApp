@@ -1,9 +1,11 @@
 package ru.konstantin.myweatherapp.view
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,7 +18,9 @@ import ru.konstantin.myweatherapp.databinding.MainFragmentBinding
 import ru.konstantin.myweatherapp.model.AppState
 import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.service.EMPTY_SIGN
-import ru.konstantin.myweatherapp.viewmodel.MainViewModel
+import ru.konstantin.myweatherapp.viewmodel.ViewModelCity
+
+private const val IS_RUSSIAN_KEY = "LIST_OF_RUSSIAN_KEY"
 
 class MainFragment : Fragment() {
 
@@ -24,7 +28,7 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
-    private lateinit var viewModel: MainViewModel
+    private lateinit var viewModelCity: ViewModelCity
     private var _binding: MainFragmentBinding? = null
     private val binding
         get() = _binding!!
@@ -50,7 +54,7 @@ class MainFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        viewModelCity = ViewModelProvider(this).get(ViewModelCity::class.java)
 //        cityList = russianCities
     }
 
@@ -75,16 +79,33 @@ class MainFragment : Fragment() {
             mainFragmentRecyclerView.adapter = adapter
             mainFragmentFAB.setOnClickListener {
                 changeWeatherDataSet()
+                saveListOfTowns()
             }
         }
         val observer = Observer<AppState> {
             renderData(it)
         }
 
-        with(viewModel) {
+        with(viewModelCity) {
             getData().observe(viewLifecycleOwner, observer)
+            loadListOfTowns()
             GlobalScope.launch {
-                getWeatherFromRemoteSource(isDataSetRus)
+                getCityList(isDataSetRus)
+            }
+        }
+    }
+
+    private fun loadListOfTowns() {
+        requireActivity().apply {
+            isDataSetRus = getPreferences(Context.MODE_PRIVATE).getBoolean(IS_RUSSIAN_KEY, true)
+        }
+    }
+
+    private fun saveListOfTowns() {
+        requireActivity().apply {
+            getPreferences(Context.MODE_PRIVATE).edit {
+                putBoolean(IS_RUSSIAN_KEY, isDataSetRus)
+                apply()
             }
         }
     }
@@ -100,7 +121,7 @@ class MainFragment : Fragment() {
 
     private fun getData(cities: List<GeoCity>, icon: Int) {
         cityList = cities
-        viewModel.getWeatherFromRemoteSource(isDataSetRus)
+        viewModelCity.getCityList(isDataSetRus)
         binding.mainFragmentFAB.setImageResource(icon)
     }
 
@@ -124,9 +145,9 @@ class MainFragment : Fragment() {
                 )
                     .setAction(resources.getString(R.string.reload_text)) {
                         if (isDataSetRus) {
-                            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+                            viewModelCity.getCityList(isDataSetRus)
                         } else {
-                            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+                            viewModelCity.getCityList(isDataSetRus)
                         }
                     }.show()
             }

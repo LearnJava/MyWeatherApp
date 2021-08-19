@@ -7,8 +7,7 @@ import ru.konstantin.myweatherapp.model.AppState
 import ru.konstantin.myweatherapp.view.capitals
 import ru.konstantin.myweatherapp.view.russianCities
 
-class MainViewModel :
-    ViewModel() {
+class ViewModelCity: ViewModel() {
 
     private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData()
 
@@ -16,7 +15,7 @@ class MainViewModel :
         return liveDataToObserve
     }
 
-    fun getWeatherFromRemoteSource(isRussianCities: Boolean) {
+    fun getCityList(isRussianCities: Boolean) {
         liveDataToObserve.postValue(AppState.Loading)
         if (isRussianCities) {
             liveDataToObserve.postValue(AppState.Success(russianCities))

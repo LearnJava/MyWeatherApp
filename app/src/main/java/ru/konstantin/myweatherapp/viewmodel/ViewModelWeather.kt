@@ -16,7 +16,7 @@ private const val SERVER_ERROR = "Ошибка сервера"
 private const val REQUEST_ERROR = "Ошибка запроса на сервер"
 private const val CORRUPTED_DATA = "Неполные данные"
 
-class WeatherViewModel(private val weatherRepository: WeatherRepository = WeatherRepositoryImpl()) :
+class ViewModelWeather(private val weatherRepository: WeatherRepository = WeatherRepositoryImpl()) :
     ViewModel() {
 
     private val liveDataToObserve: MutableLiveData<AppWeatherState> = MutableLiveData()
