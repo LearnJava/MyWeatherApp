@@ -7,4 +7,6 @@
     <string name="feels_like_label">Ощущается как</string>
     <string name="error_text">Ошибка</string>
     <string name="reload_text">Перезагрузка</string>
+    <string name="menu_title_history">See history</string>
+    <string name="background_desc" type="id">Background image</string>
 </resources>

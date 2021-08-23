@@ -14,6 +14,7 @@ import ru.konstantin.myweatherapp.databinding.DetailsFragmentBinding
 import ru.konstantin.myweatherapp.model.AppWeatherState
 import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.model.data.WeatherBigData
+import ru.konstantin.myweatherapp.model.data.WeatherHistory
 import ru.konstantin.myweatherapp.viewmodel.ViewModelWeather
 
 class DetailsFragment : Fragment() {
@@ -89,8 +90,26 @@ class DetailsFragment : Fragment() {
             .get()
             .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
             .into(headerIcon)
+
+            val weatherHistory = WeatherHistory(geoCity.cityName,
+                temperatureValue.text.toString().toDouble(),
+                feelsLikeValue.text.toString().toDouble(), weatherBigData.current?.condition?.text?:"")
+            saveCity(weatherHistory)
         }
 
+    }
+
+    private fun saveCity(
+        weatherHistory: WeatherHistory
+    ) {
+        viewModelWeather.saveCityToDB(
+            WeatherHistory(
+                weatherHistory.city,
+                weatherHistory.temperature,
+                weatherHistory.feelsLike,
+                weatherHistory.condition
+            )
+        )
     }
 
     companion object {

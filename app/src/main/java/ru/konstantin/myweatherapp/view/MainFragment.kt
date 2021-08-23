@@ -15,7 +15,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ru.konstantin.myweatherapp.R
 import ru.konstantin.myweatherapp.databinding.MainFragmentBinding
-import ru.konstantin.myweatherapp.model.AppState
+import ru.konstantin.myweatherapp.model.AppStateCity
 import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.service.EMPTY_SIGN
 import ru.konstantin.myweatherapp.viewmodel.ViewModelCity
@@ -82,7 +82,7 @@ class MainFragment : Fragment() {
                 saveListOfTowns()
             }
         }
-        val observer = Observer<AppState> {
+        val observer = Observer<AppStateCity> {
             renderData(it)
         }
 
@@ -126,17 +126,17 @@ class MainFragment : Fragment() {
     }
 
     @DelicateCoroutinesApi
-    private fun renderData(data: AppState) {
+    private fun renderData(data: AppStateCity) {
         when (data) {
-            is AppState.Success -> {
+            is AppStateCity.Success -> {
                 binding.loadingLayout.visibility = View.GONE
                 adapter.setWeather(data.geocityList)
             }
-            is AppState.Loading -> {
+            is AppStateCity.Loading -> {
                 binding.loadingLayout.visibility = View.VISIBLE
             }
 
-            is AppState.Error -> {
+            is AppStateCity.Error -> {
                 binding.loadingLayout.visibility = View.GONE
                 Snackbar.make(
                     binding.mainFragmentFAB,

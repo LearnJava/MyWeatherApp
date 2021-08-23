@@ -6,9 +6,13 @@ import androidx.lifecycle.ViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import ru.konstantin.myweatherapp.app.App.Companion.getHistoryDao
 import ru.konstantin.myweatherapp.model.AppWeatherState
 import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.model.data.WeatherBigData
+import ru.konstantin.myweatherapp.model.data.WeatherHistory
+import ru.konstantin.myweatherapp.model.repository.LocalRepository
+import ru.konstantin.myweatherapp.model.repository.LocalRepositoryImpl
 import ru.konstantin.myweatherapp.model.repository.WeatherRepository
 import ru.konstantin.myweatherapp.model.repository.WeatherRepositoryImpl
 
@@ -20,6 +24,7 @@ class ViewModelWeather(private val weatherRepository: WeatherRepository = Weathe
     ViewModel() {
 
     private val liveDataToObserve: MutableLiveData<AppWeatherState> = MutableLiveData()
+    private val historyRepository: LocalRepository = LocalRepositoryImpl(getHistoryDao())
 
     fun getData(): LiveData<AppWeatherState> {
         return liveDataToObserve
@@ -51,6 +56,10 @@ class ViewModelWeather(private val weatherRepository: WeatherRepository = Weathe
                 )
             )
         }
+    }
+
+    fun saveCityToDB(weather: WeatherHistory) {
+        historyRepository.saveEntity(weather)
     }
 
     fun checkResponse(weatherBigData: WeatherBigData): AppWeatherState {
