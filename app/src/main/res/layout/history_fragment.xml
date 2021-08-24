@@ -5,18 +5,19 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/background_desc"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/bg_splash_foreground" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/historyFragmentRecyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/bg_splash_foreground"
-        android:contentDescription="@string/background_desc" />
 
     <include
         android:id="@+id/includedLoadingLayout"

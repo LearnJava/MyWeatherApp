@@ -4,7 +4,7 @@ import ru.konstantin.myweatherapp.room.HistoryEntity
 
 fun convertHistoryEntityToWeather(entityList: List<HistoryEntity>): List<WeatherHistory> {
     return entityList.map {
-        WeatherHistory("", it.temperature, 0.0, it.condition)
+        WeatherHistory(it.city, it.temperature, 0.0, it.condition)
     }
 }
 

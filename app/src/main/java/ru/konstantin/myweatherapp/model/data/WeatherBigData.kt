@@ -6,8 +6,6 @@ import kotlinx.android.parcel.RawValue
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-//Link to get weather https://www.weatherapi.com/api-explorer.aspx
-//http://api.weatherapi.com/v1/current.json?key=ced826e111584f05b9c154820212507&q=Saint-Petersburg&aqi=yes&lang=ru
 @Parcelize
 @Serializable
 data class WeatherBigData(

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import retrofit2.Response.error
 import ru.konstantin.myweatherapp.R
 import ru.konstantin.myweatherapp.databinding.HistoryFragmentBinding
 import ru.konstantin.myweatherapp.model.AppState
@@ -53,10 +54,10 @@ class HistoryFragment : Fragment() {
                 binding.includedLoadingLayout.loadingLayout.hide()
                 binding.historyFragmentRecyclerview.showSnackBar(
                     getString(R.string.error_text),
-                    getString(R.string.reload_text)
-                ) {
-                    viewModel.getAllHistory()
-                }
+                    getString(R.string.reload_text),
+                    {
+                        viewModel.getAllHistory()
+                    })
             }
         }
     }

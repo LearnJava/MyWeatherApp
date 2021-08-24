@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.konstantin.myweatherapp.app.App.Companion.getHistoryDao
 import ru.konstantin.myweatherapp.model.AppState
-import ru.konstantin.myweatherapp.model.AppStateCity
 import ru.konstantin.myweatherapp.model.repository.LocalRepository
 import ru.konstantin.myweatherapp.model.repository.LocalRepositoryImpl
 
