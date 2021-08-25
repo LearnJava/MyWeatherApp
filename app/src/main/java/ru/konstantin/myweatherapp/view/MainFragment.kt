@@ -81,6 +81,17 @@ class MainFragment : Fragment() {
                 changeWeatherDataSet()
                 saveListOfTowns()
             }
+
+            contactListButton.setOnClickListener() {
+                val manager = activity?.supportFragmentManager
+
+                manager?.let {
+                    manager.beginTransaction()
+                        .replace(R.id.container, ContactsFragment.newInstance())
+                        .addToBackStack(EMPTY_SIGN)
+                        .commitAllowingStateLoss()
+                }
+            }
         }
         val observer = Observer<AppStateCity> {
             renderData(it)

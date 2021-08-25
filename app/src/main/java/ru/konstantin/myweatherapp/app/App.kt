@@ -1,6 +1,7 @@
 package ru.konstantin.myweatherapp.app
 
 import android.app.Application
+import android.content.Context
 import androidx.room.Room
 import ru.konstantin.myweatherapp.room.HistoryDao
 import ru.konstantin.myweatherapp.room.HistoryDataBase
@@ -11,12 +12,16 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         appInstance = this
+        context = applicationContext
+
     }
 
     companion object {
         private var appInstance: App? = null
         private var db: HistoryDataBase? = null
         private const val DB_NAME = "History1.db"
+
+        lateinit var context: Context
 
         fun getHistoryDao(): HistoryDao {
             if (db == null) {
@@ -38,4 +43,13 @@ class App : Application() {
             return db!!.historyDao()
         }
     }
+}
+
+interface IContextProvider{
+    val context: Context
+}
+
+object ContextProvider: IContextProvider{
+    override val context: Context
+        get() = App.context
 }

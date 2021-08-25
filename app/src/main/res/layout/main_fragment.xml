@@ -27,6 +27,18 @@
         tools:listitem="@layout/main_recycler_item"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/contact_list_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/ic_baseline_connect_without_contact_24"
+        app:layout_constraintBottom_toTopOf="@+id/mainFragmentFAB"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="@null"
+        app:maxImageSize="@dimen/fab_icon_size"
+        android:contentDescription="TODO" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/mainFragmentFAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

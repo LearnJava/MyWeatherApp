@@ -41,15 +41,12 @@ android {
     packagingOptions {
         exclude "DebugProbesKt.bin"
     }
-
-//    ext {
-//        playServicesVersion = '10.2.0' // update accordingly
-//    }
 }
 
 dependencies {
     //Room
     implementation 'androidx.room:room-runtime:2.3.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt 'androidx.room:room-compiler:2.3.0'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2'

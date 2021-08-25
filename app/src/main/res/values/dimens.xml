@@ -20,4 +20,5 @@
     <dimen name="display_text_padding">8dp</dimen>
     <dimen name="display_dubble_text_padding">16dp</dimen>
     <dimen name="town_header_height">100dp</dimen>
+    <dimen name="item_text_size">30sp</dimen>
 </resources>

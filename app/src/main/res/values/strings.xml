@@ -9,4 +9,6 @@
     <string name="reload_text">Перезагрузка</string>
     <string name="menu_title_history">See history</string>
     <string name="background_desc" type="id">Background image</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
