@@ -2,9 +2,12 @@ package ru.konstantin.myweatherapp.view
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -55,7 +58,7 @@ class MainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModelCity = ViewModelProvider(this).get(ViewModelCity::class.java)
-//        cityList = russianCities
+        setHasOptionsMenu(true)
     }
 
     @DelicateCoroutinesApi
@@ -167,5 +170,21 @@ class MainFragment : Fragment() {
 
     interface OnItemViewClickListener {
         fun onItemViewClick(geoCity: GeoCity)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        val item = menu?.findItem(R.id.action_search)
+        val searchView: SearchView = item?.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                adapter.filter?.filter(newText)
+                return false
+            }
+        })
+        super.onPrepareOptionsMenu(menu)
     }
 }

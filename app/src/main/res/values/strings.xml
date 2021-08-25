@@ -11,4 +11,9 @@
     <string name="background_desc" type="id">Background image</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_search">Search</string>
+    <string name="warning_title">Доступ к контактам</string>
+    <string name="couse">Объяснение</string>
+    <string name="agree_text">Предоставить доступ</string>
+    <string name="disagree_text">Не надо</string>
 </resources>

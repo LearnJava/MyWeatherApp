@@ -1,9 +1,11 @@
 package ru.konstantin.myweatherapp.view
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import ru.konstantin.myweatherapp.R
 import ru.konstantin.myweatherapp.databinding.ActivityMainBinding
 import ru.konstantin.myweatherapp.model.data.GeoCity

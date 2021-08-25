@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import ru.konstantin.myweatherapp.R
 import ru.konstantin.myweatherapp.databinding.FragmentContactsBinding
 import ru.konstantin.myweatherapp.model.AppStateContactList
 import ru.konstantin.myweatherapp.viewmodel.ContactsViewModel
@@ -76,12 +77,12 @@ class ContactsFragment : Fragment() {
                 }
                 shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS) -> {
                     AlertDialog.Builder(it)
-                        .setTitle("Доступ к контактам")
-                        .setMessage("Объяснение")
-                        .setPositiveButton("Предоставить доступ") { _, _ ->
+                        .setTitle(R.string.warning_title)
+                        .setMessage(R.string.couse)
+                        .setPositiveButton(R.string.agree_text) { _, _ ->
                             requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
                         }
-                        .setNegativeButton("Не надо") { dialog, _ -> dialog.dismiss() }
+                        .setNegativeButton(R.string.disagree_text) { dialog, _ -> dialog.dismiss() }
                         .create()
                         .show()
                 }
