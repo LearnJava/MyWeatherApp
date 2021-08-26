@@ -7,6 +7,7 @@
     <dimen name="fab_margin">15dp</dimen>
     <dimen name="fab_icon_size">56dp</dimen>
     <dimen name="recycler_item_padding">10dp</dimen>
+    <dimen name="temperature_text_size">15sp</dimen>
     <dimen name="recycler_item_text_size">25sp</dimen>
     <dimen name="recycler_item_line_height">10dp</dimen>
     <dimen name="recycler_item_line_margin_end">20dp</dimen>
@@ -18,4 +19,6 @@
     <dimen name="display_height">70dp</dimen>
     <dimen name="display_text_padding">8dp</dimen>
     <dimen name="display_dubble_text_padding">16dp</dimen>
+    <dimen name="town_header_height">100dp</dimen>
+    <dimen name="item_text_size">30sp</dimen>
 </resources>

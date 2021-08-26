@@ -2,29 +2,32 @@ package ru.konstantin.myweatherapp.view
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import ru.konstantin.myweatherapp.databinding.MainRecyclerItemBinding
 import ru.konstantin.myweatherapp.model.data.GeoCity
-import ru.konstantin.myweatherapp.model.data.WeatherBigData
 
 class MainFragmentAdapter :
-    RecyclerView.Adapter<MainFragmentAdapter.MainViewHolder>() {
+    RecyclerView.Adapter<MainFragmentAdapter.MainViewHolder>(), Filterable {
 
-    private var geoCities: List<GeoCity> = listOf()
+    private var geoCities = mutableListOf<GeoCity>()
+    private var geoCitiesAll: List<GeoCity> = listOf()
 
     private var onItemViewClickListener: MainFragment.OnItemViewClickListener? = null
 
-    fun setOnItemViewClickListener(onItemViewClickListener: MainFragment.OnItemViewClickListener){
+    fun setOnItemViewClickListener(onItemViewClickListener: MainFragment.OnItemViewClickListener) {
         this.onItemViewClickListener = onItemViewClickListener
     }
 
-    fun removeOnItemViewClickListener(){
+    fun removeOnItemViewClickListener() {
         onItemViewClickListener = null
     }
 
     fun setWeather(data: List<GeoCity>) {
-        geoCities = data
+        geoCities = data.toMutableList()
+        geoCitiesAll = data
         notifyDataSetChanged()
     }
 
@@ -56,6 +59,38 @@ class MainFragmentAdapter :
                     Toast.LENGTH_LONG
                 ).show()
             }
+        }
+    }
+
+    override fun getFilter(): Filter? {
+        return myFilter
+    }
+
+    var myFilter: Filter = object : Filter() {
+        //Automatic on background thread
+        override fun performFiltering(charSequence: CharSequence): FilterResults {
+            val filteredList: MutableList<GeoCity> = ArrayList()
+            if (charSequence.isEmpty()) {
+                filteredList.addAll(geoCitiesAll)
+            } else {
+                for (geoCity in geoCitiesAll) {
+                    if (geoCity.cityName.toLowerCase()
+                            .contains(charSequence.toString().toLowerCase())
+                    ) {
+                        filteredList.add(geoCity)
+                    }
+                }
+            }
+            val filterResults = FilterResults()
+            filterResults.values = filteredList
+            return filterResults
+        }
+
+        //Automatic on UI thread
+        override fun publishResults(charSequence: CharSequence, filterResults: FilterResults) {
+            geoCities.clear()
+            geoCities.addAll(filterResults.values as Collection<GeoCity>)
+            notifyDataSetChanged()
         }
     }
 }

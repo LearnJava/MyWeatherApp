@@ -1,9 +1,14 @@
 package ru.konstantin.myweatherapp.view
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,10 +18,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ru.konstantin.myweatherapp.R
 import ru.konstantin.myweatherapp.databinding.MainFragmentBinding
-import ru.konstantin.myweatherapp.model.AppState
+import ru.konstantin.myweatherapp.model.AppStateCity
 import ru.konstantin.myweatherapp.model.data.GeoCity
 import ru.konstantin.myweatherapp.service.EMPTY_SIGN
-import ru.konstantin.myweatherapp.viewmodel.MainViewModel
+import ru.konstantin.myweatherapp.viewmodel.ViewModelCity
+
+private const val IS_RUSSIAN_KEY = "LIST_OF_RUSSIAN_KEY"
 
 class MainFragment : Fragment() {
 
@@ -24,7 +31,7 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
-    private lateinit var viewModel: MainViewModel
+    private lateinit var viewModelCity: ViewModelCity
     private var _binding: MainFragmentBinding? = null
     private val binding
         get() = _binding!!
@@ -50,8 +57,8 @@ class MainFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-//        cityList = russianCities
+        viewModelCity = ViewModelProvider(this).get(ViewModelCity::class.java)
+        setHasOptionsMenu(true)
     }
 
     @DelicateCoroutinesApi
@@ -75,16 +82,44 @@ class MainFragment : Fragment() {
             mainFragmentRecyclerView.adapter = adapter
             mainFragmentFAB.setOnClickListener {
                 changeWeatherDataSet()
+                saveListOfTowns()
+            }
+
+            contactListButton.setOnClickListener() {
+                val manager = activity?.supportFragmentManager
+
+                manager?.let {
+                    manager.beginTransaction()
+                        .replace(R.id.container, ContactsFragment.newInstance())
+                        .addToBackStack(EMPTY_SIGN)
+                        .commitAllowingStateLoss()
+                }
             }
         }
-        val observer = Observer<AppState> {
+        val observer = Observer<AppStateCity> {
             renderData(it)
         }
 
-        with(viewModel) {
+        with(viewModelCity) {
             getData().observe(viewLifecycleOwner, observer)
+            loadListOfTowns()
             GlobalScope.launch {
-                getWeatherFromRemoteSource(isDataSetRus)
+                getCityList(isDataSetRus)
+            }
+        }
+    }
+
+    private fun loadListOfTowns() {
+        requireActivity().apply {
+            isDataSetRus = getPreferences(Context.MODE_PRIVATE).getBoolean(IS_RUSSIAN_KEY, true)
+        }
+    }
+
+    private fun saveListOfTowns() {
+        requireActivity().apply {
+            getPreferences(Context.MODE_PRIVATE).edit {
+                putBoolean(IS_RUSSIAN_KEY, isDataSetRus)
+                apply()
             }
         }
     }
@@ -100,22 +135,22 @@ class MainFragment : Fragment() {
 
     private fun getData(cities: List<GeoCity>, icon: Int) {
         cityList = cities
-        viewModel.getWeatherFromRemoteSource(isDataSetRus)
+        viewModelCity.getCityList(isDataSetRus)
         binding.mainFragmentFAB.setImageResource(icon)
     }
 
     @DelicateCoroutinesApi
-    private fun renderData(data: AppState) {
+    private fun renderData(data: AppStateCity) {
         when (data) {
-            is AppState.Success -> {
+            is AppStateCity.Success -> {
                 binding.loadingLayout.visibility = View.GONE
                 adapter.setWeather(data.geocityList)
             }
-            is AppState.Loading -> {
+            is AppStateCity.Loading -> {
                 binding.loadingLayout.visibility = View.VISIBLE
             }
 
-            is AppState.Error -> {
+            is AppStateCity.Error -> {
                 binding.loadingLayout.visibility = View.GONE
                 Snackbar.make(
                     binding.mainFragmentFAB,
@@ -124,9 +159,9 @@ class MainFragment : Fragment() {
                 )
                     .setAction(resources.getString(R.string.reload_text)) {
                         if (isDataSetRus) {
-                            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+                            viewModelCity.getCityList(isDataSetRus)
                         } else {
-                            viewModel.getWeatherFromRemoteSource(isDataSetRus)
+                            viewModelCity.getCityList(isDataSetRus)
                         }
                     }.show()
             }
@@ -135,5 +170,21 @@ class MainFragment : Fragment() {
 
     interface OnItemViewClickListener {
         fun onItemViewClick(geoCity: GeoCity)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        val item = menu?.findItem(R.id.action_search)
+        val searchView: SearchView = item?.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                adapter.filter?.filter(newText)
+                return false
+            }
+        })
+        super.onPrepareOptionsMenu(menu)
     }
 }
