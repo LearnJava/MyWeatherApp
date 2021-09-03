@@ -7,6 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import ru.konstantin.myweatherapp.R
@@ -38,9 +44,26 @@ class DetailsFragment : Fragment() {
         return binding.root
     }
 
+    private lateinit var map: GoogleMap
+
+    private val callback = OnMapReadyCallback { googleMap ->
+        map = googleMap
+        val initialPlace = LatLng(geoCity.latitude, geoCity.longitude)
+        googleMap.addMarker(
+            MarkerOptions().position(initialPlace).title(geoCity.cityName)
+        )
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialPlace, 10.0F))
+    }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         geoCity = arguments?.getParcelable<GeoCity>(BUNDLE_EXTRA) ?: GeoCity("", 0.0, 0.0)
+
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(callback)
+        }
 
         val observer = Observer<AppWeatherState> { appWeatherState ->
             renderData(appWeatherState)
@@ -86,14 +109,17 @@ class DetailsFragment : Fragment() {
             temperatureValue.text = weatherBigData.current?.tempC.toString()
             feelsLikeValue.text = weatherBigData.current?.feelslikeC.toString()
 
-        Picasso
-            .get()
-            .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
-            .into(headerIcon)
+            Picasso
+                .get()
+                .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
+                .into(headerIcon)
 
-            val weatherHistory = WeatherHistory(geoCity.cityName,
+            val weatherHistory = WeatherHistory(
+                geoCity.cityName,
                 temperatureValue.text.toString().toDouble(),
-                feelsLikeValue.text.toString().toDouble(), weatherBigData.current?.condition?.text?:"")
+                feelsLikeValue.text.toString().toDouble(),
+                weatherBigData.current?.condition?.text ?: ""
+            )
             saveCity(weatherHistory)
         }
 
