@@ -52,7 +52,9 @@ class DetailsFragment : Fragment() {
         googleMap.addMarker(
             MarkerOptions().position(initialPlace).title(geoCity.cityName)
         )
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialPlace, 10.0F))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialPlace,
+            resources.getInteger(R.integer.zoom_map).toFloat()
+        ))
     }
 
 
@@ -61,9 +63,7 @@ class DetailsFragment : Fragment() {
         geoCity = arguments?.getParcelable<GeoCity>(BUNDLE_EXTRA) ?: GeoCity("", 0.0, 0.0)
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(callback)
-        }
+        mapFragment?.let { it.getMapAsync(callback) }
 
         val observer = Observer<AppWeatherState> { appWeatherState ->
             renderData(appWeatherState)

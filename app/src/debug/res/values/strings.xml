@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyWeatherApp Beta</string>
+    <string name="app_name">MyWeatherApp Debug</string>
     <string name="update_weather">Update Weather</string>
     <string name="temperature_label">Температура</string>
     <string name="main_condition_label">Кратное описание погоды</string>
